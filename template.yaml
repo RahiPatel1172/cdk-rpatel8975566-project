@@ -1,0 +1,131 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'AWS CloudFormation Template for rpatel8975566 project'
+
+Resources:
+  RpatelS3Bucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: !Sub 'rpatel-8975566-bucket-${AWS::AccountId}'
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  RpatelDynamoTable:
+    Type: 'AWS::DynamoDB::Table'
+    Properties:
+      TableName: 'rpatel-table-8975566'
+      AttributeDefinitions:
+        - AttributeName: 'id'
+          AttributeType: 'S'
+      KeySchema:
+        - AttributeName: 'id'
+          KeyType: 'HASH'
+      BillingMode: 'PAY_PER_REQUEST'
+
+  RpatelLambdaFunction:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      FunctionName: 'rpatel-lambda-8975566'
+      Handler: 'index.handler'
+      Role: !Sub 'arn:aws:iam::${AWS::AccountId}:role/LabRole'  # Using the pre-existing LabRole
+      Code:
+        ZipFile: |
+          exports.handler = async (event) => {
+            console.log('Lambda executed by rpatel8975566!');
+            return {
+              statusCode: 200,
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                message: 'Success',
+                timestamp: new Date().toISOString(),
+                requestId: event.requestContext?.requestId
+              })
+            };
+          };
+      Runtime: 'nodejs18.x'
+      Environment:
+        Variables:
+          BUCKET_NAME: !Ref RpatelS3Bucket
+          TABLE_NAME: !Ref RpatelDynamoTable
+
+  RpatelArtifactBucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      BucketName: !Sub 'rpatel-artifacts-8975566-${AWS::AccountId}'
+      VersioningConfiguration:
+        Status: Enabled
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  RpatelPipeline:
+    Type: 'AWS::CodePipeline::Pipeline'
+    Properties:
+      Name: 'rpatel-pipeline-8975566'
+      RoleArn: !Sub 'arn:aws:iam::${AWS::AccountId}:role/LabRole'
+      ArtifactStore:
+        Type: S3
+        Location: !Ref RpatelArtifactBucket
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: Source
+              ActionTypeId:
+                Category: Source
+                Owner: AWS
+                Version: '1'
+                Provider: CodeCommit
+              Configuration:
+                RepositoryName: !Ref RpatelRepository
+                BranchName: main
+              OutputArtifacts:
+                - Name: SourceCode
+              RunOrder: 1
+        - Name: Deploy
+          Actions:
+            - Name: Deploy
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Version: '1'
+                Provider: CloudFormation
+              Configuration:
+                ActionMode: CREATE_UPDATE
+                StackName: !Ref AWS::StackName
+                TemplatePath: SourceCode::template.yaml
+                Capabilities: CAPABILITY_NAMED_IAM
+                RoleArn: !Sub 'arn:aws:iam::${AWS::AccountId}:role/LabRole'
+              InputArtifacts:
+                - Name: SourceCode
+              RunOrder: 1
+
+  RpatelRepository:
+    Type: AWS::CodeCommit::Repository
+    Properties:
+      RepositoryName: 'rpatel-repo-8975566'
+      RepositoryDescription: 'CodeCommit Repository for rpatel8975566 project'
+
+Outputs:
+  BucketName:
+    Description: 'Name of the created S3 bucket'
+    Value: !Ref RpatelS3Bucket
+
+  TableName:
+    Description: 'Name of the created DynamoDB table'
+    Value: !Ref RpatelDynamoTable
+
+  LambdaFunction:
+    Description: 'Name of the created Lambda function'
+    Value: !Ref RpatelLambdaFunction
+
+  PipelineName:
+    Description: 'Name of the CodePipeline'
+    Value: !Ref RpatelPipeline
+
+  RepositoryCloneUrlHttp:
+    Description: 'URL to clone the repository'
+    Value: !GetAtt RpatelRepository.CloneUrlHttp 
