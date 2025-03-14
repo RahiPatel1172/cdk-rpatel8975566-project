@@ -1,6 +1,22 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: 'AWS CloudFormation Template for rpatel8975566 project'
 
+Parameters:
+  GitHubOwner:
+    Type: String
+    Description: GitHub repository owner
+  GitHubRepo:
+    Type: String
+    Description: GitHub repository name
+  GitHubBranch:
+    Type: String
+    Description: GitHub branch name
+    Default: main
+  GitHubToken:
+    Type: String
+    Description: GitHub OAuth Token
+    NoEcho: true
+
 Resources:
   RpatelS3Bucket:
     Type: 'AWS::S3::Bucket'
@@ -29,7 +45,7 @@ Resources:
     Properties:
       FunctionName: 'rpatel-lambda-8975566'
       Handler: 'index.handler'
-      Role: !Sub 'arn:aws:iam::${AWS::AccountId}:role/LabRole'  # Using the pre-existing LabRole
+      Role: !Sub 'arn:aws:iam::${AWS::AccountId}:role/LabRole'
       Code:
         ZipFile: |
           exports.handler = async (event) => {
@@ -76,12 +92,15 @@ Resources:
             - Name: Source
               ActionTypeId:
                 Category: Source
-                Owner: AWS
+                Owner: ThirdParty
                 Version: '1'
-                Provider: CodeCommit
+                Provider: GitHub
               Configuration:
-                RepositoryName: !Ref RpatelRepository
-                BranchName: main
+                Owner: !Ref GitHubOwner
+                Repo: !Ref GitHubRepo
+                Branch: !Ref GitHubBranch
+                OAuthToken: !Ref GitHubToken
+                PollForSourceChanges: true
               OutputArtifacts:
                 - Name: SourceCode
               RunOrder: 1
@@ -103,12 +122,6 @@ Resources:
                 - Name: SourceCode
               RunOrder: 1
 
-  RpatelRepository:
-    Type: AWS::CodeCommit::Repository
-    Properties:
-      RepositoryName: 'rpatel-repo-8975566'
-      RepositoryDescription: 'CodeCommit Repository for rpatel8975566 project'
-
 Outputs:
   BucketName:
     Description: 'Name of the created S3 bucket'
@@ -124,8 +137,4 @@ Outputs:
 
   PipelineName:
     Description: 'Name of the CodePipeline'
-    Value: !Ref RpatelPipeline
-
-  RepositoryCloneUrlHttp:
-    Description: 'URL to clone the repository'
-    Value: !GetAtt RpatelRepository.CloneUrlHttp 
+    Value: !Ref RpatelPipeline 
