@@ -33,15 +33,43 @@ export class CdkRpatel8975566ProjectStack extends cdk.Stack {
       runtime: lambda.Runtime.NODEJS_18_X,
       handler: 'index.handler',
       code: lambda.Code.fromInline(`
+        const AWS = require('aws-sdk');
+        const s3 = new AWS.S3();
+        const dynamodb = new AWS.DynamoDB.DocumentClient();
+
         exports.handler = async (event) => {
           console.log('Lambda executed by rpatel8975566!');
+          
+          // Get bucket info
+          const bucketParams = {
+            Bucket: process.env.BUCKET_NAME
+          };
+          const bucketInfo = await s3.getBucketVersioning(bucketParams).promise();
+          
+          // Save execution record to DynamoDB
+          const timestamp = new Date().toISOString();
+          const dbParams = {
+            TableName: process.env.TABLE_NAME,
+            Item: {
+              id: timestamp,
+              executionTime: timestamp,
+              requestId: event.requestContext?.requestId || 'direct-invoke'
+            }
+          };
+          await dynamodb.put(dbParams).promise();
+          
           return {
             statusCode: 200,
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              message: 'Success',
-              timestamp: new Date().toISOString(),
-              requestId: event.requestContext?.requestId
+              message: 'Success from rpatel8975566!',
+              timestamp: timestamp,
+              requestId: event.requestContext?.requestId || 'direct-invoke',
+              bucketInfo: {
+                name: process.env.BUCKET_NAME,
+                versioning: bucketInfo.Status || 'Enabled'
+              },
+              dynamoTable: process.env.TABLE_NAME
             })
           };
         };
@@ -50,6 +78,8 @@ export class CdkRpatel8975566ProjectStack extends cdk.Stack {
         BUCKET_NAME: bucket.bucketName,
         TABLE_NAME: table.tableName,
       },
+      timeout: cdk.Duration.seconds(30),
+      memorySize: 256
     });
 
     // Grant Lambda permissions

@@ -2,9 +2,9 @@
 
 ## Project Overview
 In this project, I demonstrate AWS infrastructure as code using CloudFormation. It creates a serverless backend with:
-- S3 Bucket for file storage
-- DynamoDB Table for data persistence
-- Lambda Function for business logic
+- S3 Bucket for file storage (`rpatel-8975566-bucket-351435317420`)
+- DynamoDB Table for data persistence (`rpatel-table-8975566`)
+- Lambda Function for business logic (`rpatel-lambda-8975566`)
 
 ## Architecture
 ```
@@ -31,73 +31,99 @@ In this project, I demonstrate AWS infrastructure as code using CloudFormation. 
    npm run build
    ```
 
-3. Testing:
-   ```bash
-   npm run test
-   ```
-
 ## Deployment Process
 
-I implemented automated deployments using GitHub Actions. The workflow includes:
+The project uses AWS CodePipeline for automated deployments. The pipeline includes:
 
-1. **Validation Stage**
-   - Validates CloudFormation template
-   - Checks AWS credentials
-   - Verifies resource configurations
+1. **Source Stage**
+   - Monitors GitHub repository for changes
+   - Uses CodeStar connection for GitHub integration
+   - Triggers pipeline on code changes
 
-2. **Deployment Stage**
+2. **Build Stage**
+   - Uses AWS CodeBuild
+   - Installs dependencies
+   - Builds and synthesizes CDK code
+   - Generates CloudFormation template
+
+3. **Deploy Stage**
+   - Manual approval step for safety
    - Deploys CloudFormation stack
    - Creates/updates AWS resources
-   - Manages stack updates
-
-3. **Verification Stage**
-   - Confirms resource creation
-   - Tests resource accessibility
    - Validates stack outputs
 
 ## CI/CD Implementation
 
-### GitHub Actions Workflow
-Due to AWS Academy lab environment limitations, I implemented CI/CD using GitHub Actions. The workflow:
-- Automatically validates and deploys changes
-- Manages AWS credentials securely
-- Provides deployment logs and status
-- Ensures consistent deployments
+### AWS CodePipeline
+The pipeline is configured to:
+- Monitor the GitHub repository
+- Build and validate changes
+- Deploy to AWS with approval
+- Manage infrastructure updates
 
-### Security Considerations
-I implemented several security measures:
-- AWS credentials stored as GitHub Secrets
-- No hardcoded values in code
-- Secure resource naming conventions
-- Proper IAM role configurations
+### Security Features
+- AWS CodeStar connection for secure GitHub integration
+- IAM roles with least privilege
+- Resource policies for S3 and DynamoDB
+- Secure Lambda execution environment
 
 ## Testing the Resources
 
 1. Test Lambda Function:
    ```bash
-   aws lambda invoke --function-name ${STACK_NAME}-lambda --payload '{}' response.json
+   aws lambda invoke \
+     --function-name rpatel-lambda-8975566 \
+     --region us-east-2 \
+     --payload '{}' response.json
    ```
 
 2. Test DynamoDB:
    ```bash
    # Write item
    aws dynamodb put-item \
-     --table-name ${STACK_NAME}-table \
+     --table-name rpatel-table-8975566 \
+     --region us-east-2 \
      --item '{"id": {"S": "test1"}, "message": {"S": "Hello!"}}'
 
    # Read item
    aws dynamodb get-item \
-     --table-name ${STACK_NAME}-table \
+     --table-name rpatel-table-8975566 \
+     --region us-east-2 \
      --key '{"id": {"S": "test1"}}'
    ```
 
-3. S3 Bucket:
-   The bucket is created with secure settings:
-   - Public access blocked
-   - Server-side encryption enabled
-   - Versioning enabled
+3. Test S3 Bucket:
+   ```bash
+   # List contents
+   aws s3 ls s3://rpatel-8975566-bucket-351435317420 --region us-east-2
+   
+   # Upload file
+   aws s3 cp test.txt s3://rpatel-8975566-bucket-351435317420/ --region us-east-2
+   ```
 
-## AWS Academy Lab Environment Note
-While AWS CodePipeline is commonly used in production environments, I chose to implement GitHub Actions due to lab environment constraints. This provides equivalent functionality while working within the available permissions.
+## Resource Configuration
+
+### S3 Bucket
+- Name: rpatel-8975566-bucket-351435317420
+- Region: us-east-2
+- Features:
+  - Versioning enabled
+  - Public access blocked
+  - Server-side encryption
+
+### DynamoDB Table
+- Name: rpatel-table-8975566
+- Region: us-east-2
+- Configuration:
+  - Partition key: id (String)
+  - On-demand capacity
+
+### Lambda Function
+- Name: rpatel-lambda-8975566
+- Region: us-east-2
+- Runtime: Node.js 18.x
+- Environment variables:
+  - BUCKET_NAME
+  - TABLE_NAME
 
 
