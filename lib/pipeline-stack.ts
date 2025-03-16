@@ -48,17 +48,30 @@ export class PipelineStack extends cdk.Stack {
           'npm install -g aws-cdk',
           'npm ci',
           'npm run build',
-          'npx cdk synth',
-          'npx cdk deploy --require-approval never'
+          'npx cdk synth'
         ],
         primaryOutputDirectory: 'cdk.out'
       }),
-      selfMutation: true
+      selfMutation: true,
+      crossAccountKeys: true
     });
 
     // Add deployment stage
-    const deployStage = new cdk.Stage(this, 'Deploy');
-    new CdkRpatel8975566ProjectStack(deployStage, 'AppStack');
-    pipeline.addStage(deployStage);
+    const deployStage = new cdk.Stage(this, 'Deploy', {
+      env: {
+        account: '351435317420',
+        region: 'us-east-2'
+      }
+    });
+    
+    // Add application stack to deployment stage
+    const appStack = new CdkRpatel8975566ProjectStack(deployStage, 'AppStack');
+    
+    // Add deployment stage to pipeline with manual approval
+    pipeline.addStage(deployStage, {
+      pre: [
+        new pipelines.ManualApprovalStep('Approve')
+      ]
+    });
   }
 } 
