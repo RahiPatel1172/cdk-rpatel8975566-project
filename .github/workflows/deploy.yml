@@ -19,7 +19,7 @@ jobs:
         echo "Validating CloudFormation template..."
         aws cloudformation validate-template \
           --template-body file://template.yaml
-        echo "validation_status=success" >> $GITHUB_OUTPUT
+        echo "validation_status=success" >> "$GITHUB_ENV"
 
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v4
@@ -36,9 +36,9 @@ jobs:
       run: |
         echo "Checking if stack exists..."
         if aws cloudformation describe-stacks --stack-name ${{ secrets.STACK_NAME }}; then
-          echo "stack_exists=true" >> $GITHUB_OUTPUT
+          echo "stack_exists=true" >> "$GITHUB_ENV"
         else
-          echo "stack_exists=false" >> $GITHUB_OUTPUT
+          echo "stack_exists=false" >> "$GITHUB_ENV"
         fi
 
     - name: Deploy CloudFormation Stack
@@ -51,10 +51,10 @@ jobs:
           --capabilities CAPABILITY_NAMED_IAM \
           --no-fail-on-empty-changeset \
           --tags Project=${{ secrets.PROJECT_TAG }} Owner=${{ secrets.OWNER_TAG }}
-        echo "deploy_status=success" >> $GITHUB_OUTPUT
+        echo "deploy_status=success" >> "$GITHUB_ENV"
 
     - name: Verify Stack Resources
-      if: steps.deploy.outputs.deploy_status == 'success'
+      if: env.deploy_status == 'success'
       run: |
         echo "Verifying stack resources..."
         aws cloudformation list-stack-resources \
