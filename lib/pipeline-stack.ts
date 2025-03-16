@@ -8,6 +8,8 @@ export class PipelineStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
+    const connectionArn = 'arn:aws:codeconnections:us-east-2:351435317420:connection/54355a3a-1aaf-4191-9d84-eea29a20cfcd';
+
     // Create pipeline role with necessary permissions
     const pipelineRole = new iam.Role(this, 'PipelineRole', {
       assumedBy: new iam.ServicePrincipal('codepipeline.amazonaws.com'),
@@ -16,23 +18,18 @@ export class PipelineStack extends cdk.Stack {
         iam.ManagedPolicy.fromAwsManagedPolicyName('AWSCodeStarFullAccess'),
         iam.ManagedPolicy.fromAwsManagedPolicyName('AWSCodeBuildAdminAccess'),
         iam.ManagedPolicy.fromAwsManagedPolicyName('AWSCloudFormationFullAccess'),
-        iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonS3FullAccess'),
-        iam.ManagedPolicy.fromAwsManagedPolicyName('SecretsManagerReadWrite')
+        iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonS3FullAccess')
       ]
     });
 
-    // Add inline policy for CodePipeline with explicit CodeStar permissions
+    // Add inline policy for CodePipeline
     pipelineRole.addToPolicy(new iam.PolicyStatement({
       effect: iam.Effect.ALLOW,
       actions: [
         'codepipeline:*',
         'codestar-connections:UseConnection',
-        'codestar-connections:GetConnection',
-        'codestar-connections:ListConnections',
         'iam:PassRole',
-        'sts:AssumeRole',
-        'secretsmanager:GetSecretValue',
-        'secretsmanager:DescribeSecret'
+        'sts:AssumeRole'
       ],
       resources: ['*']
     }));
@@ -46,7 +43,8 @@ export class PipelineStack extends cdk.Stack {
           'RahiPatel1172/cdk-rpatel8975566-project',
           'master',
           {
-            connectionArn: 'arn:aws:codeconnections:us-east-2:351435317420:connection/54355a3a-1aaf-4191-9d84-eea29a20cfcd'
+            connectionArn: connectionArn,
+            actionName: 'GitHub_Source'
           }
         ),
         commands: [
