@@ -56,19 +56,6 @@ export class CdkRpatel8975566ProjectStack extends cdk.Stack {
     bucket.grantReadWrite(func);
     table.grantReadWriteData(func);
 
-    // Create Pipeline
-    const pipeline = new pipelines.CodePipeline(this, 'RpatelPipeline', {
-      pipelineName: 'rpatel-pipeline-8975566',
-      synth: new pipelines.ShellStep('Synth', {
-        input: pipelines.CodePipelineSource.gitHub('RahiPatel1172/cdk-rpatel8975566-project', 'master'),
-        commands: [
-          'npm ci',
-          'npm run build',
-          'npx cdk synth'
-        ],
-      }),
-    });
-
     // Output the resource names
     new cdk.CfnOutput(this, 'BucketName', {
       value: bucket.bucketName,
