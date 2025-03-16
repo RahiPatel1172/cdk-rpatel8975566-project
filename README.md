@@ -21,7 +21,7 @@ This project demonstrates AWS infrastructure as code using CloudFormation. It cr
 
 ## Local Development
 1. Prerequisites:
-   - Node.js 18+
+   - Node.js 
    - AWS CLI
    - AWS CDK CLI
 
@@ -94,6 +94,4 @@ For this project, we use manual deployments through CloudFormation. In a product
    - Server-side encryption enabled
    - Versioning available
 
-## Author
 
-Created by rpatel8975566
