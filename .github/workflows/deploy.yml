@@ -9,6 +9,12 @@ jobs:
     
     steps:
     - uses: actions/checkout@v2
+    
+    # Validate template before deployment
+    - name: Validate CloudFormation Template
+      run: |
+        aws cloudformation validate-template \
+          --template-body file://template.yaml
 
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
@@ -18,9 +24,24 @@ jobs:
         aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
         aws-region: us-east-1
 
+    # Check if stack exists
+    - name: Check Stack Status
+      id: check-stack
+      continue-on-error: true
+      run: |
+        aws cloudformation describe-stacks \
+          --stack-name rpatel-8975566-stack
+
     - name: Deploy to AWS CloudFormation
       run: |
         aws cloudformation deploy \
           --template-file template.yaml \
           --stack-name rpatel-8975566-stack \
-          --capabilities CAPABILITY_NAMED_IAM 
+          --capabilities CAPABILITY_NAMED_IAM \
+          --no-fail-on-empty-changeset
+
+    - name: Verify Deployment
+      run: |
+        echo "Verifying stack resources..."
+        aws cloudformation list-stack-resources \
+          --stack-name rpatel-8975566-stack 
