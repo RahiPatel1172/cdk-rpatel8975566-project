@@ -1,11 +1,19 @@
+# AWS CloudFormation Template for my project
+# Author: rpatel8975566
+# Created: March 2025
 AWSTemplateFormatVersion: '2010-09-09'
 Description: 'AWS CloudFormation Template for rpatel8975566 project'
 
 Resources:
-  RpatelS3Bucket:
-    Type: 'AWS::S3::Bucket'
+  # S3 Bucket for storing files
+  RpatelBucket:
+    Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub 'rpatel-8975566-bucket-${AWS::AccountId}'
+      BucketName: rpatel-8975566-bucket-234902362832
+      # Enable versioning for file history
+      VersioningConfiguration:
+        Status: Enabled
+      # Block all public access for security
       PublicAccessBlockConfiguration:
         BlockPublicAcls: true
         BlockPublicPolicy: true
@@ -47,13 +55,13 @@ Resources:
       Runtime: 'nodejs18.x'
       Environment:
         Variables:
-          BUCKET_NAME: !Ref RpatelS3Bucket
+          BUCKET_NAME: !Ref RpatelBucket
           TABLE_NAME: !Ref RpatelDynamoTable
 
 Outputs:
   BucketName:
     Description: 'Name of the created S3 bucket'
-    Value: !Ref RpatelS3Bucket
+    Value: !Ref RpatelBucket
 
   TableName:
     Description: 'Name of the created DynamoDB table'
