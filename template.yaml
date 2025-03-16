@@ -6,7 +6,7 @@ Description: 'AWS CloudFormation Template for rpatel8975566 project'
 
 Resources:
   # S3 Bucket for storing files
-  RpatelBucket:
+  RpatelS3Bucket:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: rpatel-8975566-bucket-234902362832
@@ -55,13 +55,13 @@ Resources:
       Runtime: 'nodejs18.x'
       Environment:
         Variables:
-          BUCKET_NAME: !Ref RpatelBucket
+          BUCKET_NAME: !Ref RpatelS3Bucket
           TABLE_NAME: !Ref RpatelDynamoTable
 
 Outputs:
   BucketName:
     Description: 'Name of the created S3 bucket'
-    Value: !Ref RpatelBucket
+    Value: !Ref RpatelS3Bucket
 
   TableName:
     Description: 'Name of the created DynamoDB table'
