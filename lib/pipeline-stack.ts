@@ -16,18 +16,23 @@ export class PipelineStack extends cdk.Stack {
         iam.ManagedPolicy.fromAwsManagedPolicyName('AWSCodeStarFullAccess'),
         iam.ManagedPolicy.fromAwsManagedPolicyName('AWSCodeBuildAdminAccess'),
         iam.ManagedPolicy.fromAwsManagedPolicyName('AWSCloudFormationFullAccess'),
-        iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonS3FullAccess')
+        iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonS3FullAccess'),
+        iam.ManagedPolicy.fromAwsManagedPolicyName('SecretsManagerReadWrite')
       ]
     });
 
-    // Add inline policy for CodePipeline
+    // Add inline policy for CodePipeline with explicit CodeStar permissions
     pipelineRole.addToPolicy(new iam.PolicyStatement({
       effect: iam.Effect.ALLOW,
       actions: [
         'codepipeline:*',
-        'codestar-connections:*',
+        'codestar-connections:UseConnection',
+        'codestar-connections:GetConnection',
+        'codestar-connections:ListConnections',
         'iam:PassRole',
-        'sts:AssumeRole'
+        'sts:AssumeRole',
+        'secretsmanager:GetSecretValue',
+        'secretsmanager:DescribeSecret'
       ],
       resources: ['*']
     }));
