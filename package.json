@@ -22,8 +22,8 @@
   "dependencies": {
     "@aws-cdk/aws-codecommit": "^1.203.0",
     "@aws-cdk/pipelines": "^1.203.0",
-    "aws-cdk-lib": "^2.128.0",
-    "constructs": "^10.4.2",
+    "aws-cdk-lib": "^2.88.0",
+    "constructs": "^10.2.70",
     "source-map-support": "^0.5.21"
   }
 }

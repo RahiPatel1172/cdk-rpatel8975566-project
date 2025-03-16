@@ -1,11 +1,14 @@
 #!/usr/bin/env node
+import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import { CdkRpatel8975566ProjectStack } from '../lib/cdk-rpatel8975566-project-stack';
+import { PipelineStack } from '../lib/pipeline-stack';
 
 const app = new cdk.App();
-new CdkRpatel8975566ProjectStack(app, 'RpatelResourceStack', {
+new PipelineStack(app, 'rpatel-8975566-pipeline-stack', {
   env: {
     account: process.env.CDK_DEFAULT_ACCOUNT,
-    region: process.env.CDK_DEFAULT_REGION
+    region: 'us-east-2'
   }
 });
+
+app.synth();
