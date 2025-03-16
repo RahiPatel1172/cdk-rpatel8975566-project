@@ -1,8 +1,25 @@
+# CDK & Node.js
 *.js
 !jest.config.js
 *.d.ts
 node_modules
+cdk.out
+
+# IDE & System files
+.DS_Store
+.idea/
+.vscode/
+
+# Test & Debug files
+*.log
+response.json
+coverage/
+.nyc_output/
+
+# AWS & Credentials
+.aws/
+*.pem
+.env
 
 # CDK asset staging directory
 .cdk.staging
-cdk.out
