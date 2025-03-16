@@ -1,18 +1,21 @@
-name: Deploy to AWS
+name: Deploy CDK Infrastructure - rpatel8975566
 
 on:
   workflow_dispatch:
 
 jobs:
   deploy:
+    name: Deploy AWS Resources
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout Code
+      uses: actions/checkout@v2
     
     # Validate template before deployment
     - name: Validate CloudFormation Template
       run: |
+        echo "Validating CloudFormation template..."
         aws cloudformation validate-template \
           --template-body file://template.yaml
 
@@ -25,23 +28,26 @@ jobs:
         aws-region: us-east-1
 
     # Check if stack exists
-    - name: Check Stack Status
+    - name: Check Existing Stack
       id: check-stack
       continue-on-error: true
       run: |
+        echo "Checking if stack Rpatel-8975566-stack exists..."
         aws cloudformation describe-stacks \
-          --stack-name rpatel-8975566-stack
+          --stack-name Rpatel-8975566-stack
 
-    - name: Deploy to AWS CloudFormation
+    - name: Deploy CloudFormation Stack
       run: |
+        echo "Deploying stack Rpatel-8975566-stack..."
         aws cloudformation deploy \
           --template-file template.yaml \
-          --stack-name rpatel-8975566-stack \
+          --stack-name Rpatel-8975566-stack \
           --capabilities CAPABILITY_NAMED_IAM \
-          --no-fail-on-empty-changeset
+          --no-fail-on-empty-changeset \
+          --tags Project=rpatel8975566 Owner=rpatel8975566
 
-    - name: Verify Deployment
+    - name: Verify Stack Resources
       run: |
-        echo "Verifying stack resources..."
+        echo "Verifying resources for stack Rpatel-8975566-stack..."
         aws cloudformation list-stack-resources \
-          --stack-name rpatel-8975566-stack 
+          --stack-name Rpatel-8975566-stack 
