@@ -1,15 +1,13 @@
-# AWS CloudFormation Template for my project
-# Author: rpatel8975566
-# Created: March 2025
+# AWS CloudFormation Template
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'AWS CloudFormation Template for rpatel8975566 project'
+Description: 'AWS CloudFormation Template'
 
 Resources:
   # S3 Bucket for storing files
-  RpatelS3Bucket:
+  S3Bucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: rpatel-8975566-bucket-234902362832
+      BucketName: !Sub '${AWS::StackName}-bucket-${AWS::AccountId}'
       # Enable versioning for file history
       VersioningConfiguration:
         Status: Enabled
@@ -20,10 +18,10 @@ Resources:
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
 
-  RpatelDynamoTable:
+  DynamoTable:
     Type: 'AWS::DynamoDB::Table'
     Properties:
-      TableName: 'rpatel-table-8975566'
+      TableName: !Sub '${AWS::StackName}-table'
       AttributeDefinitions:
         - AttributeName: 'id'
           AttributeType: 'S'
@@ -32,16 +30,16 @@ Resources:
           KeyType: 'HASH'
       BillingMode: 'PAY_PER_REQUEST'
 
-  RpatelLambdaFunction:
+  LambdaFunction:
     Type: 'AWS::Lambda::Function'
     Properties:
-      FunctionName: 'rpatel-lambda-8975566'
+      FunctionName: !Sub '${AWS::StackName}-lambda'
       Handler: 'index.handler'
       Role: !Sub 'arn:aws:iam::${AWS::AccountId}:role/LabRole'
       Code:
         ZipFile: |
           exports.handler = async (event) => {
-            console.log('Lambda executed by rpatel8975566!');
+            console.log('Lambda executed successfully!');
             return {
               statusCode: 200,
               headers: { "Content-Type": "application/json" },
@@ -55,18 +53,18 @@ Resources:
       Runtime: 'nodejs18.x'
       Environment:
         Variables:
-          BUCKET_NAME: !Ref RpatelS3Bucket
-          TABLE_NAME: !Ref RpatelDynamoTable
+          BUCKET_NAME: !Ref S3Bucket
+          TABLE_NAME: !Ref DynamoTable
 
 Outputs:
   BucketName:
     Description: 'Name of the created S3 bucket'
-    Value: !Ref RpatelS3Bucket
+    Value: !Ref S3Bucket
 
   TableName:
     Description: 'Name of the created DynamoDB table'
-    Value: !Ref RpatelDynamoTable
+    Value: !Ref DynamoTable
 
   LambdaFunction:
     Description: 'Name of the created Lambda function'
-    Value: !Ref RpatelLambdaFunction 
+    Value: !Ref LambdaFunction 
