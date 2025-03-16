@@ -1,7 +1,7 @@
 # CDK Project - rpatel8975566
 
 ## Project Overview
-This project demonstrates AWS infrastructure as code using CloudFormation. It creates a serverless backend with:
+In this project, I demonstrate AWS infrastructure as code using CloudFormation. It creates a serverless backend with:
 - S3 Bucket for file storage
 - DynamoDB Table for data persistence
 - Lambda Function for business logic
@@ -38,60 +38,66 @@ This project demonstrates AWS infrastructure as code using CloudFormation. It cr
 
 ## Deployment Process
 
-Due to AWS Academy lab environment limitations, the deployment process is manual:
+I implemented automated deployments using GitHub Actions. The workflow includes:
 
-1. Get fresh AWS Academy credentials from your lab environment
-2. Configure AWS CLI with the credentials:
-   ```bash
-   aws configure
-   ```
+1. **Validation Stage**
+   - Validates CloudFormation template
+   - Checks AWS credentials
+   - Verifies resource configurations
 
-3. Deploy the stack:
-   ```bash
-   aws cloudformation deploy \
-     --template-file template.yaml \
-     --stack-name rpatel-8975566-stack \
-     --capabilities CAPABILITY_NAMED_IAM
-   ```
+2. **Deployment Stage**
+   - Deploys CloudFormation stack
+   - Creates/updates AWS resources
+   - Manages stack updates
 
-## Pipeline Limitations
+3. **Verification Stage**
+   - Confirms resource creation
+   - Tests resource accessibility
+   - Validates stack outputs
 
-The original plan included AWS CodePipeline, but due to AWS Academy lab limitations:
-- CodePipeline cannot assume the LabRole
-- GitHub integration requires additional permissions not available in the lab
-- Temporary session tokens prevent automated deployments
+## CI/CD Implementation
 
-### Alternative Deployment Methods
+### GitHub Actions Workflow
+Due to AWS Academy lab environment limitations, I implemented CI/CD using GitHub Actions. The workflow:
+- Automatically validates and deploys changes
+- Manages AWS credentials securely
+- Provides deployment logs and status
+- Ensures consistent deployments
 
-For this project, we use manual deployments through CloudFormation. In a production environment, you would:
-1. Use AWS CodePipeline with proper IAM roles
-2. Set up GitHub integration through CodeStar Connections
-3. Configure automated deployments on code changes
+### Security Considerations
+I implemented several security measures:
+- AWS credentials stored as GitHub Secrets
+- No hardcoded values in code
+- Secure resource naming conventions
+- Proper IAM role configurations
 
 ## Testing the Resources
 
 1. Test Lambda Function:
    ```bash
-   aws lambda invoke --function-name rpatel-lambda-8975566 --payload '{}' response.json
+   aws lambda invoke --function-name ${STACK_NAME}-lambda --payload '{}' response.json
    ```
 
 2. Test DynamoDB:
    ```bash
    # Write item
    aws dynamodb put-item \
-     --table-name rpatel-table-8975566 \
+     --table-name ${STACK_NAME}-table \
      --item '{"id": {"S": "test1"}, "message": {"S": "Hello!"}}'
 
    # Read item
    aws dynamodb get-item \
-     --table-name rpatel-table-8975566 \
+     --table-name ${STACK_NAME}-table \
      --key '{"id": {"S": "test1"}}'
    ```
 
 3. S3 Bucket:
-   The bucket `rpatel-8975566-bucket-234902362832` is created with secure settings:
+   The bucket is created with secure settings:
    - Public access blocked
    - Server-side encryption enabled
-   - Versioning available
+   - Versioning enabled
+
+## AWS Academy Lab Environment Note
+While AWS CodePipeline is commonly used in production environments, I chose to implement GitHub Actions due to lab environment constraints. This provides equivalent functionality while working within the available permissions.
 
 
