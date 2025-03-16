@@ -1,9 +1,40 @@
 # CDK Project - rpatel8975566
 
-This project creates AWS resources using CloudFormation:
-- S3 Bucket (`rpatel-8975566-bucket-234902362832`)
-- DynamoDB Table (`rpatel-table-8975566`)
-- Lambda Function (`rpatel-lambda-8975566`)
+## Project Overview
+This project demonstrates AWS infrastructure as code using CloudFormation. It creates a serverless backend with:
+- S3 Bucket for file storage
+- DynamoDB Table for data persistence
+- Lambda Function for business logic
+
+## Architecture
+```
+┌──────────────┐     ┌──────────────┐
+│  S3 Bucket   │     │    Lambda    │
+│   Storage    │◄────┤   Function   │
+└──────────────┘     └──────┬───────┘
+                            │
+                     ┌──────▼───────┐
+                     │   DynamoDB   │
+                     │    Table     │
+                     └──────────────┘
+```
+
+## Local Development
+1. Prerequisites:
+   - Node.js 18+
+   - AWS CLI
+   - AWS CDK CLI
+
+2. Setup:
+   ```bash
+   npm install
+   npm run build
+   ```
+
+3. Testing:
+   ```bash
+   npm run test
+   ```
 
 ## Deployment Process
 
