@@ -1,4 +1,4 @@
-name: Deploy CDK Infrastructure - rpatel8975566
+name: Deploy CDK Infrastructure
 
 on:
   workflow_dispatch:
@@ -34,8 +34,8 @@ jobs:
       id: check-stack
       continue-on-error: true
       run: |
-        echo "Checking if stack Rpatel-8975566-stack exists..."
-        if aws cloudformation describe-stacks --stack-name Rpatel-8975566-stack; then
+        echo "Checking if stack exists..."
+        if aws cloudformation describe-stacks --stack-name ${{ secrets.STACK_NAME }}; then
           echo "stack_exists=true" >> $GITHUB_OUTPUT
         else
           echo "stack_exists=false" >> $GITHUB_OUTPUT
@@ -44,18 +44,18 @@ jobs:
     - name: Deploy CloudFormation Stack
       id: deploy
       run: |
-        echo "Deploying stack Rpatel-8975566-stack..."
+        echo "Deploying stack..."
         aws cloudformation deploy \
           --template-file template.yaml \
-          --stack-name Rpatel-8975566-stack \
+          --stack-name ${{ secrets.STACK_NAME }} \
           --capabilities CAPABILITY_NAMED_IAM \
           --no-fail-on-empty-changeset \
-          --tags Project=rpatel8975566 Owner=rpatel8975566
+          --tags Project=${{ secrets.PROJECT_TAG }} Owner=${{ secrets.OWNER_TAG }}
         echo "deploy_status=success" >> $GITHUB_OUTPUT
 
     - name: Verify Stack Resources
       if: steps.deploy.outputs.deploy_status == 'success'
       run: |
-        echo "Verifying resources for stack Rpatel-8975566-stack..."
+        echo "Verifying stack resources..."
         aws cloudformation list-stack-resources \
-          --stack-name Rpatel-8975566-stack 
+          --stack-name ${{ secrets.STACK_NAME }} 
