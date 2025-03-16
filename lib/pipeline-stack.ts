@@ -18,7 +18,9 @@ export class PipelineStack extends cdk.Stack {
         iam.ManagedPolicy.fromAwsManagedPolicyName('AWSCodeStarFullAccess'),
         iam.ManagedPolicy.fromAwsManagedPolicyName('AWSCodeBuildAdminAccess'),
         iam.ManagedPolicy.fromAwsManagedPolicyName('AWSCloudFormationFullAccess'),
-        iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonS3FullAccess')
+        iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonS3FullAccess'),
+        iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonDynamoDBFullAccess'),
+        iam.ManagedPolicy.fromAwsManagedPolicyName('AWSLambda_FullAccess')
       ]
     });
 
@@ -29,6 +31,12 @@ export class PipelineStack extends cdk.Stack {
         'codepipeline:*',
         'codestar-connections:UseConnection',
         'iam:PassRole',
+        'iam:CreateRole',
+        'iam:DeleteRole',
+        'iam:PutRolePolicy',
+        'iam:DeleteRolePolicy',
+        'iam:GetRole',
+        'iam:GetRolePolicy',
         'sts:AssumeRole'
       ],
       resources: ['*']
@@ -67,8 +75,13 @@ export class PipelineStack extends cdk.Stack {
       }
     });
     
-    // Add application stack to deployment stage
-    const appStack = new CdkRpatel8975566ProjectStack(deployStage, 'AppStack');
+    // Add application stack to deployment stage with specific environment
+    new CdkRpatel8975566ProjectStack(deployStage, 'AppStack', {
+      env: {
+        account: '351435317420',
+        region: 'us-east-2'
+      }
+    });
     
     // Add deployment stage to pipeline with manual approval
     pipeline.addStage(deployStage, {
