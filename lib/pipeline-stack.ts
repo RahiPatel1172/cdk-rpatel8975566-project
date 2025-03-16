@@ -45,11 +45,15 @@ export class PipelineStack extends cdk.Stack {
           }
         ),
         commands: [
+          'npm install -g aws-cdk',
           'npm ci',
           'npm run build',
-          'npx cdk synth'
+          'npx cdk synth',
+          'npx cdk deploy --require-approval never'
         ],
+        primaryOutputDirectory: 'cdk.out'
       }),
+      selfMutation: true
     });
 
     // Add deployment stage
