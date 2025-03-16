@@ -16,6 +16,7 @@ artifacts:
     - cdk.out/**/*
     - package.json
     - package-lock.json
+    - README.md
     - tsconfig.json
     - bin/**/*
     - lib/**/* 

@@ -1,22 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: 'AWS CloudFormation Template for rpatel8975566 project'
 
-Parameters:
-  GitHubOwner:
-    Type: String
-    Description: GitHub repository owner
-  GitHubRepo:
-    Type: String
-    Description: GitHub repository name
-  GitHubBranch:
-    Type: String
-    Description: GitHub branch name
-    Default: main
-  GitHubToken:
-    Type: String
-    Description: GitHub OAuth Token
-    NoEcho: true
-
 Resources:
   RpatelS3Bucket:
     Type: 'AWS::S3::Bucket'
@@ -66,62 +50,6 @@ Resources:
           BUCKET_NAME: !Ref RpatelS3Bucket
           TABLE_NAME: !Ref RpatelDynamoTable
 
-  RpatelArtifactBucket:
-    Type: 'AWS::S3::Bucket'
-    Properties:
-      BucketName: !Sub 'rpatel-artifacts-8975566-${AWS::AccountId}'
-      VersioningConfiguration:
-        Status: Enabled
-      PublicAccessBlockConfiguration:
-        BlockPublicAcls: true
-        BlockPublicPolicy: true
-        IgnorePublicAcls: true
-        RestrictPublicBuckets: true
-
-  RpatelPipeline:
-    Type: 'AWS::CodePipeline::Pipeline'
-    Properties:
-      Name: 'rpatel-pipeline-8975566'
-      RoleArn: !Sub 'arn:aws:iam::${AWS::AccountId}:role/LabRole'
-      ArtifactStore:
-        Type: S3
-        Location: !Ref RpatelArtifactBucket
-      Stages:
-        - Name: Source
-          Actions:
-            - Name: Source
-              ActionTypeId:
-                Category: Source
-                Owner: ThirdParty
-                Version: '1'
-                Provider: GitHub
-              Configuration:
-                Owner: !Ref GitHubOwner
-                Repo: !Ref GitHubRepo
-                Branch: !Ref GitHubBranch
-                OAuthToken: !Ref GitHubToken
-                PollForSourceChanges: true
-              OutputArtifacts:
-                - Name: SourceCode
-              RunOrder: 1
-        - Name: Deploy
-          Actions:
-            - Name: Deploy
-              ActionTypeId:
-                Category: Deploy
-                Owner: AWS
-                Version: '1'
-                Provider: CloudFormation
-              Configuration:
-                ActionMode: CREATE_UPDATE
-                StackName: !Ref AWS::StackName
-                TemplatePath: SourceCode::template.yaml
-                Capabilities: CAPABILITY_NAMED_IAM
-                RoleArn: !Sub 'arn:aws:iam::${AWS::AccountId}:role/LabRole'
-              InputArtifacts:
-                - Name: SourceCode
-              RunOrder: 1
-
 Outputs:
   BucketName:
     Description: 'Name of the created S3 bucket'
@@ -133,8 +61,4 @@ Outputs:
 
   LambdaFunction:
     Description: 'Name of the created Lambda function'
-    Value: !Ref RpatelLambdaFunction
-
-  PipelineName:
-    Description: 'Name of the CodePipeline'
-    Value: !Ref RpatelPipeline 
+    Value: !Ref RpatelLambdaFunction 

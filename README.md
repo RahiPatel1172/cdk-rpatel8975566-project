@@ -1,58 +1,67 @@
 # CDK Project - rpatel8975566
 
-This project is an AWS CDK application that demonstrates the creation and management of AWS resources using Infrastructure as Code (IaC). The project includes a CI/CD pipeline using AWS CodePipeline for automated deployments.
+This project creates AWS resources using CloudFormation:
+- S3 Bucket (`rpatel-8975566-bucket-234902362832`)
+- DynamoDB Table (`rpatel-table-8975566`)
+- Lambda Function (`rpatel-lambda-8975566`)
 
-## Architecture
+## Deployment Process
 
-The project creates the following AWS resources:
-- S3 Bucket (`rpatel-8975566-bucket`)
-- DynamoDB Table (`RpatelTable-8975566`)
-- Lambda Function (`RpatelLambda-8975566`)
-- AWS CodePipeline for CI/CD
+Due to AWS Academy lab environment limitations, the deployment process is manual:
 
-## Prerequisites
-
-- Node.js 18.x or later
-- AWS CLI configured with appropriate credentials
-- AWS CDK CLI (`npm install -g aws-cdk`)
-
-## Setup Instructions
-
-1. Clone the repository:
+1. Get fresh AWS Academy credentials from your lab environment
+2. Configure AWS CLI with the credentials:
    ```bash
-   git clone https://github.com/RahiPatel1172/cdk-rpatel8975566-project.git
-   cd cdk-rpatel8975566-project
+   aws configure
    ```
 
-2. Install dependencies:
+3. Deploy the stack:
    ```bash
-   npm install
+   aws cloudformation deploy \
+     --template-file template.yaml \
+     --stack-name rpatel-8975566-stack \
+     --capabilities CAPABILITY_NAMED_IAM
    ```
 
-3. Build the project:
+## Pipeline Limitations
+
+The original plan included AWS CodePipeline, but due to AWS Academy lab limitations:
+- CodePipeline cannot assume the LabRole
+- GitHub integration requires additional permissions not available in the lab
+- Temporary session tokens prevent automated deployments
+
+### Alternative Deployment Methods
+
+For this project, we use manual deployments through CloudFormation. In a production environment, you would:
+1. Use AWS CodePipeline with proper IAM roles
+2. Set up GitHub integration through CodeStar Connections
+3. Configure automated deployments on code changes
+
+## Testing the Resources
+
+1. Test Lambda Function:
    ```bash
-   npm run build
+   aws lambda invoke --function-name rpatel-lambda-8975566 --payload '{}' response.json
    ```
 
-4. Deploy the stack:
+2. Test DynamoDB:
    ```bash
-   cdk deploy
+   # Write item
+   aws dynamodb put-item \
+     --table-name rpatel-table-8975566 \
+     --item '{"id": {"S": "test1"}, "message": {"S": "Hello!"}}'
+
+   # Read item
+   aws dynamodb get-item \
+     --table-name rpatel-table-8975566 \
+     --key '{"id": {"S": "test1"}}'
    ```
 
-## CI/CD Pipeline
-
-The project includes an AWS CodePipeline that automatically deploys changes when code is pushed to the main branch. The pipeline:
-1. Sources code from GitHub
-2. Builds and synthesizes the CDK app
-3. Deploys the infrastructure changes
-
-## Project Structure
-
-- `bin/` - CDK app entry point
-- `lib/` - Stack definitions
-- `test/` - Unit tests
-- `cdk.json` - CDK configuration
-- `buildspec.yml` - AWS CodeBuild specification
+3. S3 Bucket:
+   The bucket `rpatel-8975566-bucket-234902362832` is created with secure settings:
+   - Public access blocked
+   - Server-side encryption enabled
+   - Versioning available
 
 ## Author
 
