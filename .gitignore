@@ -23,3 +23,30 @@ coverage/
 
 # CDK asset staging directory
 .cdk.staging
+
+# IDE
+.idea/
+.vscode/
+
+# Node
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Build
+dist/
+build/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Misc
+.DS_Store
+*.pem
+response.json
+
+# Project specific
+SUBMISSION.md
