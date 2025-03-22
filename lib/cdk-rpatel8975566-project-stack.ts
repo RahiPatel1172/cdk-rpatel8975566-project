@@ -39,7 +39,7 @@ export class CdkRpatel8975566ProjectStack extends cdk.Stack {
       }
       `),
       environment: {
-      BUCKET_NAME: myBucket.bucketName,
+      BUCKET_NAME: bucket.bucketName,
       },
     });
   }
