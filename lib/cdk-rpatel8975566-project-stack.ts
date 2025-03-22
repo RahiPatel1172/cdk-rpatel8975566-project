@@ -11,7 +11,7 @@ export class CdkRpatel8975566ProjectStack extends cdk.Stack {
 
     // Create S3 bucket
     const bucket = new s3.Bucket(this, 'RpatelBucket1', {
-      bucketName: `rpatel-8975566-bucket-${this.account}`,
+      bucketName: `rpatel-8975566-bucket1-${this.account}`,
       versioned: true,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       autoDeleteObjects: true,
