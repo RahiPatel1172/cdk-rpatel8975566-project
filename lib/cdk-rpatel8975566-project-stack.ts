@@ -13,10 +13,7 @@ export class CdkRpatel8975566ProjectStack extends cdk.Stack {
     const bucket = new s3.Bucket(this, 'RpatelBucket1', {
       bucketName: `rpatel-8975566-bucket1-${this.account}`,
       versioned: true,
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
-      autoDeleteObjects: true,
-      publicReadAccess: false,
-      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+      removalPolicy: cdk.RemovalPolicy.DESTROY
     });
 
     // Create DynamoDB table
