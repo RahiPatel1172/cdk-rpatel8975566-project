@@ -1,22 +1,12 @@
 version: 0.2
 phases:
   install:
-    runtime-versions:
-      nodejs: 18
     commands:
       - npm install -g aws-cdk
       - npm install
   build:
     commands:
-      - npm run build
-      - npx cdk synth
-      - npx cdk deploy --require-approval never
+      - cdk synth
 artifacts:
   files:
-    - cdk.out/**/*
-    - package.json
-    - package-lock.json
-    - README.md
-    - tsconfig.json
-    - bin/**/*
-    - lib/**/* 
+    - 'cdk.out/**/*.template.json'
