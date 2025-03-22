@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import { CdkStack } from '../lib/cdk-rpatel8975566-project-stack';
+import { CdkRpatel8975566ProjectStack } from '../lib/cdk-rpatel8975566-project-stack';
 
 const app = new cdk.App();
-new CdkStack(app, 'rpatel-8975566-pipeline-stack', {});
+new CdkRpatel8975566ProjectStack(app, 'rpatel-8975566-pipeline-stack', {});
