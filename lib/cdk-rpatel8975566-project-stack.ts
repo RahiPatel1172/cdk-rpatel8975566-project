@@ -27,20 +27,20 @@ export class CdkRpatel8975566ProjectStack extends cdk.Stack {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
-    // Output the resource names
-    new cdk.CfnOutput(this, 'BucketName', {
-      value: bucket.bucketName,
-      description: 'The name of the S3 bucket',
-    });
-
-    new cdk.CfnOutput(this, 'TableName', {
-      value: table.tableName,
-      description: 'The name of the DynamoDB table',
-    });
-
-    new cdk.CfnOutput(this, 'LambdaName', {
-      value: func.functionName,
-      description: 'The name of the Lambda function',
+    // Create Lamda Function
+     const myLambda = new lambda.Function(this, 'MyLambda', {
+      functionName: 'cdk-lambda-rpatel',
+      runtime: lambda.Runtime.NODEJS_18_X,
+      handler: 'index.handler',
+      code: lambda.Code.fromInline(`
+      exports.handler = async function(event) {
+        console.log('Lambda invoked!');
+        return { statusCode: 200, body: 'Hello, World!' };
+      }
+      `),
+      environment: {
+      BUCKET_NAME: myBucket.bucketName,
+      },
     });
   }
 }
